@@ -338,6 +338,7 @@
   };
 
   Selectpicker.VERSION = '1.12.4';
+  isMobile = (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
 
   // part of this is duplicated in i18n/defaults-en_US.js. Make sure to update both.
   Selectpicker.DEFAULTS = {
@@ -385,7 +386,8 @@
     mobile: false,
     selectOnTab: false,
     dropdownAlignRight: false,
-    windowPadding: 0
+    windowPadding: 0,
+	isMobile: isMobile
   };
 
   Selectpicker.prototype = {
@@ -1363,7 +1365,7 @@
 
           if (!that.multiple || (that.multiple && that.options.maxOptions === 1)) {
             that.$button.focus();
-          } else if (that.options.liveSearch) {
+          } else if (that.options.liveSearch && !isMobile) {
             that.$searchbox.focus();
           }
 
@@ -1383,7 +1385,7 @@
         if (e.currentTarget == this) {
           e.preventDefault();
           e.stopPropagation();
-          if (that.options.liveSearch && !$(e.target).hasClass('close')) {
+          if (that.options.liveSearch && !isMobile && !$(e.target).hasClass('close')) {
             that.$searchbox.focus();
           } else {
             that.$button.focus();
@@ -1394,7 +1396,7 @@
       this.$menuInner.on('click', '.divider, .dropdown-header', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        if (that.options.liveSearch) {
+        if (that.options.liveSearch && !isMobile) {
           that.$searchbox.focus();
         } else {
           that.$button.focus();
@@ -1410,7 +1412,7 @@
       });
 
       this.$menu.on('click', '.actions-btn', function (e) {
-        if (that.options.liveSearch) {
+        if (that.options.liveSearch && !isMobile) {
           that.$searchbox.focus();
         } else {
           that.$button.focus();
@@ -1445,9 +1447,11 @@
           if (!!$no_results.parent().length) $no_results.remove();
         }
         if (!that.multiple) that.$menuInner.find('.selected').addClass('active');
-        setTimeout(function () {
-          that.$searchbox.focus();
-        }, 10);
+        if(!isMobile) {
+			setTimeout(function () {
+			  that.$searchbox.focus();
+			}, 10);
+		}
       });
 
       this.$searchbox.on('click.dropdown.data-api focus.dropdown.data-api touchend.dropdown.data-api', function (e) {
@@ -1645,7 +1649,9 @@
         } else {
           that.$button.trigger('click');
         }
-        that.$searchbox.focus();
+        if(!isMobile) {
+			that.$searchbox.focus();
+		}
         return;
       }
 
